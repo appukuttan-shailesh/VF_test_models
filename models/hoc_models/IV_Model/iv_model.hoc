@@ -1,0 +1,62 @@
+load_file("nrngui.hoc") // To load the main gui menu panel
+
+create cell
+access cell
+
+cell {
+	insert hh
+}
+
+tstop = 200
+
+objref g_iv, rec_v, rec_ina, rec_ik, rec_temp_na, rec_temp_k
+
+objref vstim
+cell vstim = new VClamp(0.5)
+vstim.dur[0] = 50
+vstim.dur[1] = 100
+vstim.dur[2] = 50
+tstop = vstim.dur[0]+vstim.dur[1]+vstim.dur[2]
+vstim.amp[0] = -65
+vstim.amp[1] = -65
+vstim.amp[2] = -65
+
+proc get_IVdata() {
+	plotGraph = $1
+	print "plotGraph = ", plotGraph
+
+	rec_v = new Vector()
+	rec_ina = new Vector()
+	rec_ik = new Vector()
+
+	rec_temp_na = new Vector()
+	rec_temp_na.record(&cell.ina(0.5))
+	rec_temp_k = new Vector()
+	rec_temp_k.record(&cell.ik(0.5))
+
+	for (i=-100; i<=100; i=i+20) {
+		vstim.amp[1] = i
+		print "Clamp Level =", i
+
+		run()
+
+		if(vstim.amp[1] < (cell.ena)){
+				rec_ina.append(rec_temp_na.min())
+		} else{
+				rec_ina.append(rec_temp_na.max())
+		}
+		rec_ik.append(rec_temp_k.max())
+
+		rec_v.append(vstim.amp[1])
+	}
+
+	if (plotGraph == 1) {
+		g_iv = new Graph()
+		g_iv.size(-200,200,-10,10)
+		g_iv.label(500,500,"IV Curve Na")
+		rec_ina.plot(g_iv,rec_v,2,2)
+		g_iv.exec_menu("Keep Lines")
+		rec_ik.plot(g_iv,rec_v,3,2)
+		g_iv.exec_menu("View = plot")
+	}
+}

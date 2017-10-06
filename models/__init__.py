@@ -1,5 +1,6 @@
 import os
 import sciunit
+from neuron import h
 from hbp_validation_framework.versioning import Versioned
 
 #==============================================================================
@@ -31,7 +32,8 @@ class testColumn(sciunit.Model, Versioned):
 #==============================================================================
 
 class hippoCircuit(sciunit.Model, Versioned):
-        id = "f25d05b2-2358-418b-8914-fe02a412ac74"
+        #id = "f25d05b2-2358-418b-8914-fe02a412ac74"
+        id = "f32776c7-658f-462f-a944-1daf8765ec97" #New VF
 
         def __init__(self, name="hippoCircuit", density_info={}):
             self.density_info = density_info
@@ -41,11 +43,11 @@ class hippoCircuit(sciunit.Model, Versioned):
             self.set_density_info_default()
 
         def set_density_info_default(self):
-            self.density_info = { "density" : {"value" : "260 1000/mm3"}}
+            self.density_info = { "density" : {"value" : "250 1000/mm3"}}
 
         def get_density_info(self):
             return self.density_info
-    
+
 #==============================================================================
 
 #class neuroM_loader(sciunit.Model, cap.HandlesNeuroM, Versioned):
@@ -77,7 +79,7 @@ class neuroM_loader(sciunit.Model, Versioned):
 
         def get_soma_diameter_info(self):
             return self.soma_diameter
-        
+
 #==============================================================================
 
 class NeuroM_NeuriteLength(sciunit.Model, Versioned):
@@ -120,3 +122,43 @@ class CA1Layers_NeuritePathDistance(sciunit.Model, Versioned):
     def get_CA1LayersNeuritePathDistance_info(self):
         return self.CA1LayersNeuritePathDistance_info
 
+#==============================================================================
+
+class IV_Curve_Generator(sciunit.Model, Versioned):
+    id = ""
+
+    def __init__(self, name="IV_Curve_Generator", iv_data={}):
+        self.iv_data = iv_data
+        sciunit.Model.__init__(self, name=name)
+        self.name = name
+        self.description = "Dummy model for comparing IV curves of channels"
+        self.set_iv_data_default()
+
+    def set_iv_data_default(self):
+        self.iv_data = {"IV":
+                            {
+                                "V":["-100 mV","-80 mV","-60 mV","-40 mV","-20 mV","0 mV","20 mV","40 mV","60 mV","80 mV","100 mV"],
+                                "I":["5 mA/cm2","4 mA/cm2","3 mA/cm2","2 mA/cm2","1 mA/cm2","0 mA/cm2","1 mA/cm2","2 mA/cm2","3 mA/cm2","4 mA/cm2","5 mA/cm2"]
+                            }
+                       }
+
+    def get_iv_data(self):
+        return self.iv_data
+
+#==============================================================================
+
+class IV_Model():
+
+    def __init__(self, name="IV_Model"):
+        """ Constructor. """
+        h.load_file("./hoc_models/IV_Model/iv_model.hoc")
+        h('get_IVdata(0)')
+        self.i_data = h.rec_ina.to_python()
+        self.v_data = h.rec_v.to_python()
+
+    def get_iv_data(self):
+        return self.i_data, self.v_data
+
+#model = IV_Model()
+#print model.get_iv_data()
+#==============================================================================
