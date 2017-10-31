@@ -41,7 +41,8 @@ print "----------------------------------------------"
 # or offer to register it
 # test_library = TestLibrary() # default url for HBP service
 test_library = TestLibrary(username="shailesh") # default url for HBP service
-test = test_library.get_test(alias=config.test, instance_id=config.instance_id)
+# test = test_library.get_test(alias=config.test, instance_id=config.instance_id)
+test = test_library.get_validation_test(alias=config.test, version=config.instance_id)
 print "----------------------------------------------"
 print "Test name: ", test
 print "Test type: ", type(test)
@@ -59,12 +60,16 @@ print "----------------------------------------------"
 
 # Register the result with the HBP Validation service
 # This could be integrated into test.judge() if we extend sciunit appropriately
+print "=============================================="
+print "Enter Collab ID for Data Storage (if applicable)
+print "(Leave empty for Model's host collab, i.e. ", model.content, ")"
+score.related_data["project"] = raw_input('Collab ID: ')
+
 collab_folder = "{}_{}".format(config.model, datetime.now().strftime("%Y%m%d-%H%M%S"))
-collab_storage = CollabDataStore(collab_id="1771",
+# TODO: have collab_id automatically entered
+collab_storage = CollabDataStore(collab_id=score.related_data["project"],
                                  base_folder=collab_folder,
                                  auth=test_library.auth)
 
-score.related_data["test_instance_id"] = config.instance_id
-#test_library.register_result(score)
-#test_library.register_result(test_result=score, data_store=collab_storage)
-test_library.register_result(test_result=score)
+test_library.register_result(test_result=score, data_store=collab_storage)
+# test_library.register_result(test_result=score)
