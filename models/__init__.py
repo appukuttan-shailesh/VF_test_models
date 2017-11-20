@@ -34,7 +34,7 @@ class testColumn(sciunit.Model, Versioned):
 class hippoCircuit(sciunit.Model, Versioned):
         #id = "f25d05b2-2358-418b-8914-fe02a412ac74"
         #id = "f32776c7-658f-462f-a944-1daf8765ec97" #New VF v1.0
-        id = "c9db962f-53e7-4c05-b817-c7bced1a9108" #New VF v2.0
+        instance_id = "c9db962f-53e7-4c05-b817-c7bced1a9108" #New VF v2.0
 
         def __init__(self, name="hippoCircuit", density_info={}):
             self.density_info = density_info
